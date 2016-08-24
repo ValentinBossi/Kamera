@@ -1,5 +1,20 @@
 var pictures = [];
 var main = function () {
+	
+	$("button").click(function(){
+		height = $(window).height();
+		$("#div1").css("height", height);
+        $("#div1").slideDown(500);
+        //$("#div2").fadeIn("slow");
+        //$("#div3").fadeIn(3000);
+    });
+
+	$("[name='download']").each(function () {
+		console.log("each download");
+		$(this).click(function () {
+			top.location.href = this.value;
+		});
+	});
 
 	//geht nicht mit id da einzigartig! selector ist das name attribut
 	$("[name='loeschen']").each(function () {
@@ -42,11 +57,18 @@ var main = function () {
 			newPictureName = newPic.newPicture;
 			$("#gifloader").remove();
 			var text = "Foto machen";
-			$("#fotoMachen").text(text);
-
-			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + newPictureName + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><a style="margin-right: 10px;" type="button" class="btn btn-danger" name="loeschen" id="' + newPictureName + '">Löschen</a><a style="margin-right: 10px;" type="button" class="btn btn-success" href="vorschau/' + newPictureName + '">Download</a></div></td></tr>';
+			$("#fotoMachen").html('<span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span>');
+			
+			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + newPictureName + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + newPictureName + '"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;" class="btn btn-default" value="vorschau/' + newPictureName + '"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>';
 
 			$("#letzterTable").prepend(html);
+
+			$("[name='download']").each(function () {
+				console.log("each download");
+				$(this).click(function () {
+					top.location.href = this.value;
+				});
+			});
 
 			//geht nicht mit id da einzigartig! selector ist das name attribut
 			$("[name='loeschen']").each(function (index) {

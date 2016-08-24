@@ -37,7 +37,7 @@ var systemStatus = {
 	usbOK: usbOK,
 	kameraOK: kameraOK
 };
-var pathToMediaFolder = '/home/pi/GreinerCam/NodeJS/Express/public/pictures/';
+var pathToMediaFolder = '/home/pi/git/Kamera/public/pictures/';
 var arrayOfPictures;
 var objectOfPicturesArray = [];
 var usbStick = "/media/usb0";
@@ -55,7 +55,7 @@ var usbCheck = function () {
 		//console.log('stdout ' + stdout);
 		//console.log('stderr ' + stderr);
 		if (error !== null) {
-			console.log('exec error pidof raspivid: ' + error);
+			console.log('exec error mount: ' + error);
 		}
 	});
 }

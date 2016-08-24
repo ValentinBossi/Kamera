@@ -9,18 +9,49 @@
 
 <body>
 
+	<div  id="div1" style="padding-left:50%; width:100%; display:none;background-color:white">
+		<ol align="center">
+			<li align="left"><img src="gif/ajax-loader.gif" style="width: 35px; margin-right: 20px;">hallo
+			</li><li><img src="gif/ajax-loader.gif" style="width: 35px; margin-right: 20px;">haasdllo
+			</li><li><img src="gif/ajax-loader.gif" style="width: 35px; margin-right: 20px;">haasdasdasdllo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li><li>hallo
+			</li>
+		</ol>
+	</div>
+
 	<header>
 		<% include ../partials/header %>
 	</header>
 
 	<main>
-		<div align="center" style="margin-top: 25px; padding-top: 0px; padding-bottom: ; background-color:;">
+		<div align="center" style="margin-top: 25px;">
 			<button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;"  id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>
 			<button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>
 		</div>
-		<div align="center" style="margin-top: 25px; padding-bottom: ; background-color:;">
+		<div align="center" style="margin-top: 25px;">
 			<button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" href="/aufUsbStickSpeichern"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>
 		</div>
+		
+		<button id="test">Click to fade in boxes</button><br><br>
 		
 		<div>
 			
@@ -44,7 +75,7 @@
 						<% } %>
 						<div align='center' style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;"><%= picture.name %></div>
 						<div align='center' style='margin-top: 10px; margin-bottom: 20px;'>
-							<button style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;' class="btn btn-default" name="loeschen" id="<%= picture.name %>"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button name="download" style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;' type="button" class="btn btn-default" href="vorschau/<%= picture.name %>"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button>
+							<button style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;' class="btn btn-default" name="loeschen" id="<%= picture.name %>"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button name="download" style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;' class="btn btn-default" value="vorschau/<%= picture.name %>"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button>
 						</div>
 					</td>
 				</tr>
