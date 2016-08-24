@@ -37,7 +37,7 @@ var systemStatus = {
 	usbOK: usbOK,
 	kameraOK: kameraOK
 };
-var pathToMediaFolder = '/home/pi/GreinerCam/NodeJS/Express/public/pictures/';
+var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures';
 var arrayOfPictures;
 var objectOfPicturesArray = [];
 var usbStick = "/media/usb0";
