@@ -1,0 +1,56 @@
+----------------------------------------------------USB auswerfen-----------------------------------------------------------------------
+<p>app.post(‚/usbDatentraegerAuswerfen',function(){
+	
+	exec('sudo umount -a', function (error, stdout, stderr) {
+		
+		console.log('stdout ' + stdout);
+		console.log('stderr ' + stderr);
+		if (error !== null) {
+			console.log('exec error umount: ' + error);
+		}
+		res.send("USB-Datenträger ausgeworfen!");
+	});
+});
+
+$(buttoniZumAuswerfen).click(function () {
+		var ejectRequest;
+		ejectRequest = $.ajax({
+			url: "/usbDatentraegerAuswerfen",
+			dataType: "text",
+			method: "POST"
+		});
+		ejectRequest.done(function () {
+			$(buttoniZumAuswerfen).ersetzteClassMit(sucess-btn);
+		});
+	});
+
+<% if (systemStatus.usbOK) {%>
+button zum auswerfen des USB-Datenträgers
+<%} else {%>
+nichts
+<% } %>
+USB-Stick</li></p>
+......................................................................................................................................
+	
+-----------------------------------------------------------Click Switch-----------------------------------------------------------------<p>Mit ganz normalem button, das sich einfach in der Grösse ändern auf einen click(von 16:9 auf 4:3) in schwarz
+</p>
+......................................................................................................................................
+	
+------------------------------------------------Bei Serverstart im raspistill modus starten-------------------------------------------
+<p>schon mit chil-process spwan! weiss nicht ob in 4:3 oder in 16:9! Ev output zum HDMI muss im 16:9 sein?!
+	Annahme: in 4:3 Modus</p>
+......................................................................................................................................
+	
+
+---------------------------------------------------Bei Click auf Foto ein Foto machen-------------------------------------------------
+	<p>Muss einfach als default das gleiche format haben, wie das, beim Serverstart!</p>
+......................................................................................................................................
+
+---------------------------------------------------Bei Klick auf Video ein Video machen-----------------------------------------------
+<p>Es soll auch angezeigt werden, wie viel Sekunden schon aufgenommen wurden.
+	</p>
+......................................................................................................................................
+
+---------------------------------------------------Auf Datenträger speichern----------------------------------------------------------
+	<p>Ev mit Progessbar und sicher mit Loaders. Beides von w3school
+	</p>
