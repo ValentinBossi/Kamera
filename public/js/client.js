@@ -44,7 +44,7 @@ var main = function () {
 			var text = "Foto machen";
 			$("#fotoMachen").text(text);
 
-			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + newPictureName + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><a style="margin-right: 10px;" type="button" class="btn btn-danger" name="loeschen" id="' + newPictureName + '">Löschen</a><a style="margin-right: 10px;" type="button" class="btn btn-success" href="vorschau/' + newPictureName + '">Download</a></div></td></tr>';
+			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div align="center" style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;">"' + newPictureName + '"</div><div align="center" style="margin-top: 10px; margin-bottom: 20px;"><button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + newPictureName + '"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-trash"></span></button><button name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" type="button" class="btn btn-default" href="vorschau/' + newPictureName + '"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>';
 
 			$("#letzterTable").prepend(html);
 
@@ -80,9 +80,18 @@ var main = function () {
 
 
 	});
-
+	/**
 	$("#aufUsbSpeichern").click(function () {
 		window.location = "/aufUsbStickSpeichern";
+	});**/
+	
+	$("#aufUsbSpeichern").click(function () {
+		
+		
+		
+		
+		
+		
 	});
 
 	if (document.getElementById("ichArbeite") != null) {
