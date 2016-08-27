@@ -1,13 +1,76 @@
 var pictures = [];
 var main = function () {
 
+	//io.connect('/'); '/' heisst von dem server, mit dem man die Webseite bzw client.js hat! ist also generisch!
+	var socket = io.connect('/');
+	
+	$("#aufDatentraegerSpeichern").click(function(){
+		$("#datentraegerAuswerfen").replaceWith('<button disabled="disabled" title="Bin am Kopieren!" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><div align="center" class="loaderAuswerfen"></div>Kopiere!</button>');
+		$("#aufDatentraegerSpeichern").replaceWith('<button disabled="disabled" title="Bin am Kopieren!" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" ><div style="vertical-align:middle;" class="loaderSpeichern"></div>Kopiere!</button>');
+		
+	});
+	
+	/**
+	$("#datentraegerAuswerfen").mouseover(function () {
+		var element = $("#datentraegerAuswerfen");
+		if (element.is(":disabled")) {
+			$(element).attr("title", "      Kein Datenträger zum Auswerfen!");
+		} else {
+			$(element).attr("title", "Datenträger auswerfen");
+		}
+		if($(element).attr("data") === "true"){
+			$(element).attr("title", "Bin am Kopieren!");
+			$(element).attr("disabled", "disabled")
+		}
+	});
+
+	$("#aufDatentraegerSpeichern").mouseover(function () {
+		var element = $("#aufDatentraegerSpeichern");
+		if (element.is(":disabled")) {
+			$(element).attr("title", "      Kein Datenträger zum Speichern!");
+		} else {
+			$(element).attr("title", "Auf Datenträger speichern");
+		}
+		if($(element).attr("data") === "true"){
+			$(element).attr("title", "Bin am Kopieren!");
+			$(element).attr("disabled", "disabled")
+		}
+	});**/
+
+	$("#datentraegerAuswerfen").click(function () {
+		var ejectRequest;
+		var data = "datenträger soll ausgeworfen werden";
+		$(this).replaceWith('<button disabled="disabled" title="Bin am Auswerfen!" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><div align="center" class="loaderAuswerfen"></div>Werfe aus!</button>');
+		ejectRequest = $.ajax({
+			url: "/datentraegerAuswerfen",
+			dataType: "text",
+			method: "POST",
+			data: data
+		});
+		ejectRequest.done(function (data) {
+			console.log(data);
+			$("#datentraegerAuswerfen").replaceWith('<button title="    Kein Datenträger" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>');
+			$("#datentraegerAuswerfen").attr("disabled", "disabled");
+			$("#datentraegerAuswerfen").attr("title", "    Kein Datenträger");
+			$("#aufDatentraegerSpeichern").attr("disabled", "disabled");
+			$("#aufDatentraegerSpeichern").attr("title", "    Kein Datenträger");
+		});
+	});
+
+	$("[name='download']").each(function () {
+		console.log("each download");
+		$(this).click(function () {
+			top.location.href = $(this).attr("href");
+		});
+	});
+
 	//geht nicht mit id da einzigartig! selector ist das name attribut
 	$("[name='loeschen']").each(function () {
 		//console.log(element);
 		$(this).click(function () {
 			var picture = this.id;
 			var element = document.getElementById(this.id);
-			$(this).html('<img id="gifloader" src="gif/fbloader.gif" />');
+			$(this).html('<div style="vertical-align:middle;" class="loader"></div>');
 			var deleteRequest;
 			//setTimeout(function () {
 			deleteRequest = $.ajax({
@@ -28,7 +91,7 @@ var main = function () {
 
 	$('#fotoMachen').click(function () {
 
-		$(this).html('<img id="gifloader" src="gif/fbloader.gif" />');
+		$(this).html('<div style="vertical-align:middle;" class="loader"></div>');
 
 		var photoRequest = $.ajax({
 			url: "/fotoMachen",
@@ -42,11 +105,17 @@ var main = function () {
 			newPictureName = newPic.newPicture;
 			$("#gifloader").remove();
 			var text = "Foto machen";
-			$("#fotoMachen").text(text);
+			$("#fotoMachen").html('<span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span>');
 
-			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div align="center" style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;">"' + newPictureName + '"</div><div align="center" style="margin-top: 10px; margin-bottom: 20px;"><button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + newPictureName + '"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-trash"></span></button><button name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" type="button" class="btn btn-default" href="vorschau/' + newPictureName + '"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>';
+			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + newPictureName + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><button title="Löschen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + newPictureName + '"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button title="Download" name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;" class="btn btn-default" value="vorschau/' + newPictureName + '"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>';
 
 			$("#letzterTable").prepend(html);
+
+			$("[name='download']").each(function () {
+				$(this).click(function () {
+					top.location.href = $(this).attr("href");
+				});
+			});
 
 			//geht nicht mit id da einzigartig! selector ist das name attribut
 			$("[name='loeschen']").each(function (index) {
@@ -80,25 +149,16 @@ var main = function () {
 
 
 	});
-	/**
+
 	$("#aufUsbSpeichern").click(function () {
-		window.location = "/aufUsbStickSpeichern";
-	});**/
-	
-	$("#aufUsbSpeichern").click(function () {
-		
-		
-		
-		
-		
+		//window.location = "/aufUsbStickSpeichern";
 		
 	});
 
 	if (document.getElementById("ichArbeite") != null) {
 		var medienArrayLaenge;
 
-		//io.connect('/'); '/' heisst von dem server, mit dem man die Webseite bzw client.js hat! ist also generisch!
-		var socket = io.connect('/');
+
 
 		socket.on('connect', function (data) {
 			socket.emit('startCopyToUSBProcess', {

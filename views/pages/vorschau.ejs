@@ -1,4 +1,4 @@
-<!-- views/pages/index.ejs -->
+<!-- views/pages/vorschau.ejs -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,21 +9,51 @@
 
 <body>
 	
-	<div>
-		
+	<header>
+		<% include ../partials/header %>
+	</header>
 	
-	</div>
 
+
+	
 	<main>
-		<div align="center" style="margin-top: 35px;"><button id="usbStickAuswerfenTop" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button></div>
+		
+		<!-- wenn alles OK ist: Es hat ein USB Stick und nicht am Kopieren-->
+		<% if(!systemStatus.amKopieren && systemStatus.usbOK){ %>
+		<div align="center" style="margin-top: 35px;"><button title="Datenträger auswerfen" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button></div>
 
 		<div align="center" style="margin-top: 25px; padding-top: 0px; padding-bottom: ; background-color:;">
-			<button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>
-			<button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>
+			<button title="Foto schliessen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>
+			<button title="Video aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>
 		</div>
 		<div align="center" style="margin-top: 25px; padding-bottom: ; background-color:;">
-			<button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" href="/aufUsbStickSpeichern"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>
+			<button title="Medien auf Datenträger speichern" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>
 		</div>
+		<% }%>
+		
+		<!-- wenn am Speichern-->
+		<% if(systemStatus.amKopieren){ %>
+		<div align="center" style="margin-top: 35px;"><button disabled="disabled" title="Bin am Kopieren!" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><div align="center" class="loaderAuswerfen"></div>Kopiere!</button></div>
+
+		<div align="center" style="margin-top: 25px; padding-top: 0px; padding-bottom: ; background-color:;">
+			<button title="Foto schliessen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>
+			<button title="Video aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>
+		</div>
+		<div align="center" style="margin-top: 25px;"><button disabled="disabled" title="Bin am Kopieren!" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" ><div style="vertical-align:middle;" class="loaderSpeichern"></div>Kopiere!</button></div>
+		<% }%>
+		
+		<!-- wenn kein Datenträger eingesteckt ist -->
+		<% if(!systemStatus.usbOK){ %>
+		<div align="center" style="margin-top: 35px;"><button title="    Kein Datenträger" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button></div>
+
+		<div align="center" style="margin-top: 25px; padding-top: 0px; padding-bottom: ; background-color:;">
+			<button title="Foto schliessen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>
+			<button title="Video aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>
+		</div>
+		<div align="center" style="margin-top: 25px; padding-bottom: ; background-color:;">
+			<button title="    Kein Datenträger" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>
+		</div>
+		<% }%>
 
 		<div>
 
@@ -46,10 +76,10 @@
 													<img align='center' src="pictures/<%= picture.name %>" style="width: 100%;">
 													<% } %>
 														<div align='center' style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;">
-															<%= picture.name %>
+															<%= systemStatus.usbOK %>
 														</div>
 														<div align='center' style='margin-top: 10px; margin-bottom: 20px;'>
-															<button style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;' class="btn btn-default" name="loeschen" id="<%= picture.name %>"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-trash"></span></button><button name="download" style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;' type="button" class="btn btn-default" href="vorschau/<%= picture.name %>"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-cloud-download"></span></button>
+															<button title="Löschen" style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;' class="btn btn-default" name="loeschen" id="<%= picture.name %>"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-trash"></span></button><button title="Download" name="download" style='width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;' type="button" class="btn btn-default" href="<%= picture.name %>"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-cloud-download"></span></button>
 														</div>
 										</td>
 									</tr>

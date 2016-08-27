@@ -9,6 +9,10 @@ var fs = require('fs');
 var bodyParser = require("body-parser");
 var df = require("node-df");
 
+app.use(express.static(path.resolve(__dirname, "public")));
+
+app.use('/vorschau', express.static(__dirname + '/public'));
+
 var
 	options = {
 		file: '/home',
@@ -31,13 +35,16 @@ var picToCopyString;
 
 // wenn von mount ein String zurück kommt, ist ein Stick eingesteckt
 // TO-DO: checken, ob Stick Fat32 ist
-var usbOK = null;
+var usbOK = false;
 var kameraOK = true;
+var amKopieren = false;
+
 var systemStatus = {
 	usbOK: usbOK,
-	kameraOK: kameraOK
+	kameraOK: kameraOK,
+	amKopieren: amKopieren
 };
-var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures';
+var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures/';
 var arrayOfPictures;
 var objectOfPicturesArray = [];
 var usbStick = "/media/usb0";
@@ -46,16 +53,17 @@ var usbStick = "/media/usb0";
 app.locals.systemStatus = systemStatus;
 
 var usbCheck = function () {
-	exec('mount | grep "media/usb0"', function (error, stdout, stderr) {
-		if (stdout === '') {
-			systemStatus.usbOK = false;
-		} else {
+	exec('diskutil list | grep "FAT32"', function (error, stdout, stderr) {
+		if (stdout.length > 0) {
 			systemStatus.usbOK = true;
+		} else {
+			systemStatus.usbOK = false;
 		}
 		//console.log('stdout ' + stdout);
 		//console.log('stderr ' + stderr);
 		if (error !== null) {
-			console.log('exec error pidof raspivid: ' + error);
+			console.log('exec error mount: ' + error);
+			systemStatus.usbOK = false;
 		}
 	});
 }
@@ -73,7 +81,7 @@ app.use(morgan("short"));
 
 // index page 
 app.get('/', function (req, res) {
-	usbCheck();
+	//usbCheck();
 	setTimeout(function () {
 		res.render('pages/index');
 	}, 50)
@@ -85,29 +93,31 @@ io.on('connection', function (client) {
 
 	client.on('startCopyToUSBProcess', function (data) {
 		
-		
+		systemStatus.amKopieren = true;
+
+
 		if (medienOrdnerInhalt[0] !== undefined && data.sendMediaList) {
 			umgekehrteReihenfolge = [];
-			for(var i=medienOrdnerInhalt.length-1; i >= 0; i--){
+			for (var i = medienOrdnerInhalt.length - 1; i >= 0; i--) {
 				umgekehrteReihenfolge.push(medienOrdnerInhalt[i]);
 			}
 			client.emit('startCopyToUSBProcess', umgekehrteReihenfolge);
 		}
-		if(data.startCopy){
+		if (data.startCopy) {
 			picToCopyString = medienOrdnerInhalt.pop().name;
 			picToCopy = pathToMediaFolder + picToCopyString;
 			console.log(picToCopy);
 			exec("cp " + picToCopy + " " + usbStick, function (error, stdout, stderr) {
 
-					console.log('stdout ' + stdout);
-					console.log('stderr ' + stderr);
+				console.log('stdout ' + stdout);
+				console.log('stderr ' + stderr);
 
-					if (error !== null) {
-						console.log('exec error copy to usb stick: ' + error);
-					} else {
-						client.emit('startCopyToUSBProcess', picToCopyString);
-					}
-				});
+				if (error !== null) {
+					console.log('exec error copy to usb stick: ' + error);
+				} else {
+					client.emit('startCopyToUSBProcess', picToCopyString);
+				}
+			});
 		}
 		/**
 		console.log(data);
@@ -143,8 +153,8 @@ io.on('connection', function (client) {
 				client.emit('startCopyToUSBProcess', ".AppleDouble");
 			},5000)
 		}**/
-		
-		
+
+
 	});
 
 
@@ -153,6 +163,7 @@ io.on('connection', function (client) {
 
 
 app.get('/vorschau', function (reg, res) {
+	usbCheck();
 	fs.readdir(pathToMediaFolder, function (err, list) {
 		medienOrdnerInhalt = [];
 		list.forEach(function (pic) {
@@ -160,8 +171,14 @@ app.get('/vorschau', function (reg, res) {
 				name: pic
 			});
 		});
+		console.log(systemStatus);
+		console.log(medienOrdnerInhalt);
 		app.locals.pictures = medienOrdnerInhalt;
-		res.render('pages/vorschau');
+		// um usbCheck() erkennen zu koennen!
+		setTimeout(function () {
+			res.render('pages/vorschau');
+		}, 50)
+
 	});
 });
 
@@ -174,11 +191,14 @@ app.get('/vorschau/:picture', function (reg, res) {
 	res.download(pathToMediaFolder + reg.params.picture);
 });
 
+/**
 app.get("/aufUSBStickSPeichern", function (reg, res) {
 
 	res.render('pages/aufUsbStickSpeichern');
 
-});
+});**/
+
+
 /**
 app.put("/aufUSBStickSPeichern", function (reg, res) {
 	
@@ -344,7 +364,21 @@ app.get('/fotoMachen', function (req, res) {
 
 });
 
+app.post('/datentraegerAuswerfen', function (req, res) {
+
+	exec('diskutil umountDisk /dev/disk2', function (error, stdout, stderr) {
+
+		console.log('stdout ' + stdout);
+		console.log('stderr ' + stderr);
+		if (error !== null) {
+			console.log('exec error umount: ' + error);
+		} else {
+			res.send("Datenträger ausgeworfen!");
+		}
+	});
+});
+
 //console.log(fs.createReadStream('test.log').pipe(fs.createWriteStream('newLog.log')));
 
-app.use(express.static(path.resolve(__dirname, "public")));
+
 server.listen(3000);
