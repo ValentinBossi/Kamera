@@ -1,53 +1,95 @@
 .loaderSpeichern {
-  margin-left: 25%;
-  border: 1px solid black;
-  border-radius: 50%;
-  border-top: 1px solid #f4e285;
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
+	margin-left: 25%;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid #f4e285;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
 }
 
 .loaderAuswerfen {
-  margin-left: 25%;
-  border: 1px solid black;
-  border-radius: 50%;
-  border-top: 1px solid #bc4b51;
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
+	margin-left: 25%;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid #bc4b51;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
 }
 
 .loaderFoto {
-  margin-left: 25%;
-  border: 1px solid black;
-  border-radius: 50%;
-  border-top: 1px solid #f4a259;
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
+	margin-left: 25%;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid #f4a259;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
 }
 
 .loaderVideo {
-  margin-left: 25%;
-  border: 1px solid black;
-  border-radius: 50%;
-  border-top: 1px solid #f4a259;
-  width: 30px;
-  height: 30px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
+	margin-left: 25%;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid #f4a259;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
+}
+
+.loaderLoeschen {
+	margin-left: 25%;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid #bc4b51;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
+}
+
+.loaderKopieren {
+	margin-top: 5px;
+	float: left;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid white;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
 }
 
 @-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+	0% {
+		-webkit-transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+#speichernPanel {
+	display: none;
+}
+
+p {
+	float: left;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	margin-top: 10px;
 }
