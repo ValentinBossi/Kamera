@@ -1,5 +1,5 @@
-
 var main = function () {
+<<<<<<< HEAD
 	
 <<<<<<< HEAD
 	$("button").click(function(){
@@ -11,9 +11,84 @@ var main = function () {
     });
 =======
 	//soll gefüllt werden, mit fotos, die gemacht werden!
+=======
+
+
+	var status = {
+		"amKopieren": false
+	};
+
+	window.onbeforeunload = function () {
+		if (status.amKopieren) {
+			return "Der Speichervorgang wird nicht abgeschlossen, wenn du die Seite verlässt!";
+		} else {
+			return "";
+		}
+	};
+
+	var checkDownloads = function () {
+		$("[name='download']").each(function () {
+			console.log("each download");
+			$(this).click(function () {
+				top.location.href = $(this).attr("href");
+			});
+		});
+	};
+
+	var checkLoeschen = function () {
+		$("[name='loeschen']").each(function () {
+			//console.log(element);
+			$(this).click(function () {
+				var picture = this.id;
+				var element = document.getElementById(this.id);
+				$(this).html('<div style="vertical-align:middle;" class="loaderLoeschen"></div>');
+				var deleteRequest;
+				//setTimeout(function () {
+				deleteRequest = $.ajax({
+					url: "/pictureToDelete",
+					dataType: "text",
+					method: "post",
+					data: picture
+				});
+				deleteRequest.done(function (medienAufServer) {
+					console.log(medienAufServer);
+					medienOrdner = medienAufServer;
+					console.log("erste loeschen funktion");
+					$(element).remove();
+				});
+			});
+			console.log("jquery löschen ausgeführt");
+		});
+	}
+
+	checkDownloads();
+	checkLoeschen();
+
+	var auswerfenButtonParat = '<button title="Datenträger auswerfen" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>';
+	var auswerfenButtonBusy = '<button disabled="disabled" title="Datenträger auswerfen" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><div align="center" class="loaderAuswerfen"></div></button>';
+	var auswerfenButtonDisabled = '<button disabled="disabled" title="Datenträger auswerfen" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>';
+	var kopierenButtonParat = '<button title="Medien auf Datenträger speichern" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>';
+	var kopierenButtonBusy = '<button disabled="disabled" title="Medien auf Datenträger speichern" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" ><div style="vertical-align:middle;" class="loaderSpeichern"></div></button>';
+	var kopierenButtonDisabled = '<button disabled="disabled" title="Medien auf Datenträger speichern" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>';
+	var videoButtonParat = '<button title="Video aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="videoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>';
+	var videoButtonBusy = '<button disabled="disabled" title="Video aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="videoMachen" class="btn btn-default"><div align="center" class="loaderVideo"></div></button>';
+	var videoButtonDisabled = '<button disabled="disabled" title="Video aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; margin-top: ; margin-left: 100px; background-color: #f4a259;" id="videoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-facetime-video"></span></button>';
+	var fotoButtonParat = '<button title="Foto aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>';
+	var fotoButtonBusy = '<button disabled="disabled" title="Foto aufnehmen" title="Foto schliessen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><div align="center" class="loaderFoto"></div></button>';
+	var fotoButtonDisabled = '<button disabled="disabled" title="Foto aufnehmen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; margin-bottom: ; background-color: #f4a259;" id="fotoMachen" class="btn btn-default"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span></button>';
+
+
+	//soll gefüllt werden, mit fotos, die gemacht werden! hier nur zum testen!
+>>>>>>> OSX
 	var pictures = [];
+	$("img+div").each(function () {
+		pictures.push({
+			"name": this.textContent
+		});
+	});
 
 	var kameraStatus = {
+		"auswerfen": false,
 		"kopieren": false,
 		"bereitOhneUSB": false,
 		"bereitMitUSB": false,
@@ -22,26 +97,41 @@ var main = function () {
 	}
 
 	var statusDerButtons = function (kameraStatus) {
-		console.log(kameraStatus.kopieren);
+		if (kameraStatus.auswerfen) {
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonBusy);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
+			$("#videoMachen").replaceWith(videoButtonDisabled);
+			$("#fotoMachen").replaceWith(fotoButtonDisabled);
+		}
 		if (kameraStatus.kopieren) {
-			console.log("solle buttons ändern!");
-			$("#datentraegerAuswerfen").replaceWith('<button disabled="disabled" title="    Bin am Kopieren!" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><div align="center" class="loaderAuswerfen"></div>Kopiere!</button>');
-			$("#aufDatentraegerSpeichern").replaceWith('<button disabled="disabled" title="    Bin am Kopieren!" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" ><div style="vertical-align:middle;" class="loaderSpeichern"></div>Kopiere!</button>');
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonBusy);
+			$("#videoMachen").replaceWith(videoButtonDisabled);
+			$("#fotoMachen").replaceWith(fotoButtonDisabled);
 		}
 		if (kameraStatus.bereitOhneUSB) {
-			$("#datentraegerAuswerfen").replaceWith('button title="    Kein Datenträger" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>');
-			$("#aufDatentraegerSpeichern").replaceWith('<button title="    Kein Datenträger" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>');
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
+			$("#videoMachen").replaceWith(videoButtonParat);
+			$("#fotoMachen").replaceWith(fotoButtonParat);
 		}
 		if (kameraStatus.bereitMitUSB) {
-			$("#datentraegerAuswerfen").replaceWith('<button title="Datenträger auswerfen" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>');
-			$("#aufDatentraegerSpeichern").replaceWith('<button title="Medien auf Datenträger speichern" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern"><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>');
-
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonParat);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonParat);
+			$("#videoMachen").replaceWith(videoButtonParat);
+			$("#fotoMachen").replaceWith(fotoButtonParat);
 		}
 		if (kameraStatus.macheFoto) {
-
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
+			$("#videoMachen").replaceWith(videoButtonDisabled);
+			$("#fotoMachen").replaceWith(fotoButtonBusy);
 		}
 		if (kameraStatus.macheVideo) {
-
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
+			$("#videoMachen").replaceWith(videoButtonBusy);
+			$("#fotoMachen").replaceWith(fotoButtonDisabled);
 		}
 	};
 
@@ -50,13 +140,15 @@ var main = function () {
 	var medienOrdner = [];
 
 	socket.on('hatKopiert', function (bild) {
+		status.amKopieren = true;
 		console.log("hat kopiert", bild);
+		console.log(pictures);
 
-
-		$("#slide0").slideUp(400, function () {
-			$("#tr0").remove();
+		$("#slide8MP3mmLinseMode1q100Kopie8.jpg" + bild).slideUp(400, function (bild) {
+			$("#tr" + bild).remove();
 		});
 		if (bild === "ende") {
+			status.amKopieren = false;
 			statusDerButtons({
 				"kopieren": false,
 				"bereitOhneUSB": false,
@@ -73,7 +165,7 @@ var main = function () {
 	});
 
 	var aufSpeichernListeBildHinzufuegen = function (bild) {
-
+		console.log(bild);
 		var html = '<tr id="tr' + bild + '"><td><div id="slide' + bild + '"><div id="loader' + bild + '" class="loaderKopieren"></div><p>' + bild + '</p></div></td></tr>';
 		$("#bilderZumSpeichern").append(html);
 	};
@@ -81,74 +173,37 @@ var main = function () {
 
 	$("#aufDatentraegerSpeichern").click(function () {
 
-		kameraStatus = {
+		statusDerButtons({
+			"auswerfen": false,
 			"kopieren": true,
 			"bereitOhneUSB": false,
 			"bereitMitUSB": false,
 			"macheFoto": false,
 			"macheVideo": false
-		}
-		
-		statusDerButtons(kameraStatus);
+		});
 
 		socket.emit('kopierenStarten', {
 			"status": "start"
 		});
 
-		for (var i = 0; i < 5; i++) {
-			aufSpeichernListeBildHinzufuegen(i);
+		for (var i = 0; i < pictures.length; i++) {
+			aufSpeichernListeBildHinzufuegen(pictures[i].name);
 		}
 
 		$("#speichernPanel").slideDown(300);
-
-
-		setTimeout(function () {
-
-			$("#0").slideUp(400, function () {
-				$("#tr0").remove();
-			});
-
-		}, 2000);
-
-		setTimeout(function () {
-
-			$("#1").slideUp(400, function () {
-				$("#tr1").remove();
-			});
-
-		}, 4000);
-
-		setTimeout(function () {
-
-			$("#2").slideUp(400, function () {
-				$("#tr2").remove();
-			});
-
-		}, 6000);
-
-		setTimeout(function () {
-
-			$("#3").slideUp(400, function () {
-				$("#tr3").remove();
-			});
-
-		}, 8000);
-
-		setTimeout(function () {
-
-			$("#4").slideUp(400, function () {
-				$("#tr4").remove();
-			});
-
-		}, 10000);
-
-
 	});
 
 	$("#datentraegerAuswerfen").click(function () {
 		var ejectRequest;
 		var data = "datenträger soll ausgeworfen werden";
-		$(this).replaceWith('<button disabled="disabled" title="Bin am Auswerfen!" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default"><div align="center" class="loaderAuswerfen"></div>Werfe aus!</button>');
+		statusDerButtons({
+			"auswerfen": true,
+			"kopieren": false,
+			"bereitOhneUSB": false,
+			"bereitMitUSB": false,
+			"macheFoto": false,
+			"macheVideo": false
+		});
 		ejectRequest = $.ajax({
 			url: "/datentraegerAuswerfen",
 			dataType: "text",
@@ -157,6 +212,7 @@ var main = function () {
 		});
 		ejectRequest.done(function (data) {
 			console.log(data);
+<<<<<<< HEAD
 			$("#datentraegerAuswerfen").replaceWith('<button title="    Kein Datenträger" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>');
 			$("#aufDatentraegerSpeichern").replaceWith('<button title="    Kein Datenträger" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>');
 		});
@@ -194,11 +250,18 @@ var main = function () {
 				medienOrdner = medienAufServer;
 				console.log("erste loeschen funktion");
 				$(element).remove();
+=======
+			statusDerButtons({
+				"auswerfen": false,
+				"kopieren": false,
+				"bereitOhneUSB": true,
+				"bereitMitUSB": false,
+				"macheFoto": false,
+				"macheVideo": false
+>>>>>>> OSX
 			});
 		});
-		console.log("jquery löschen ausgeführt");
 	});
-
 
 	//bei jedem Fotomachen soll der medienOrdner gefüllt werden und schon in den unsichtbaren table gefüllt werden!
 	$('#fotoMachen').click(function () {
