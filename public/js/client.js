@@ -1,17 +1,4 @@
 var main = function () {
-<<<<<<< HEAD
-	
-<<<<<<< HEAD
-	$("button").click(function(){
-		height = $(window).height();
-		$("#div1").css("height", height);
-        $("#div1").slideDown(500);
-        //$("#div2").fadeIn("slow");
-        //$("#div3").fadeIn(3000);
-    });
-=======
-	//soll gefüllt werden, mit fotos, die gemacht werden!
-=======
 
 
 	var status = {
@@ -79,7 +66,6 @@ var main = function () {
 
 
 	//soll gefüllt werden, mit fotos, die gemacht werden! hier nur zum testen!
->>>>>>> OSX
 	var pictures = [];
 	$("img+div").each(function () {
 		pictures.push({
@@ -212,45 +198,6 @@ var main = function () {
 		});
 		ejectRequest.done(function (data) {
 			console.log(data);
-<<<<<<< HEAD
-			$("#datentraegerAuswerfen").replaceWith('<button title="    Kein Datenträger" id="datentraegerAuswerfen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; padding-bottom: ; padding-top:; background-color: #bc4b51;" class="btn btn-default" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-eject"></span><br>USB</button>');
-			$("#aufDatentraegerSpeichern").replaceWith('<button title="    Kein Datenträger" id="aufDatentraegerSpeichern" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285;" class="btn btn-default" id="aufUsbSpeichern" disabled="disabled" ><span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-save"></span><br>Speichern</button>');
-		});
-	});
->>>>>>> OSX
-
-	$("[name='download']").each(function () {
-		console.log("each download");
-		$(this).click(function () {
-<<<<<<< HEAD
-			top.location.href = this.value;
-=======
-			top.location.href = $(this).attr("href");
->>>>>>> OSX
-		});
-	});
-
-	//geht nicht mit id da einzigartig! selector ist das name attribut
-	$("[name='loeschen']").each(function () {
-		//console.log(element);
-		$(this).click(function () {
-			var picture = this.id;
-			var element = document.getElementById(this.id);
-			$(this).html('<div style="vertical-align:middle;" class="loaderLoeschen"></div>');
-			var deleteRequest;
-			//setTimeout(function () {
-			deleteRequest = $.ajax({
-				url: "/pictureToDelete",
-				dataType: "text",
-				method: "post",
-				data: picture
-			});
-			deleteRequest.done(function (medienAufServer) {
-				console.log(medienAufServer);
-				medienOrdner = medienAufServer;
-				console.log("erste loeschen funktion");
-				$(element).remove();
-=======
 			statusDerButtons({
 				"auswerfen": false,
 				"kopieren": false,
@@ -258,7 +205,6 @@ var main = function () {
 				"bereitMitUSB": false,
 				"macheFoto": false,
 				"macheVideo": false
->>>>>>> OSX
 			});
 		});
 	});
@@ -284,25 +230,14 @@ var main = function () {
 			$("#gifloader").remove();
 			var text = "Foto machen";
 			$("#fotoMachen").html('<span style="font-size:2.5em; vertical-align:middle;" class="glyphicon glyphicon-camera"></span>');
-<<<<<<< HEAD
-			
-			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + newPictureName + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><button style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + newPictureName + '"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;" class="btn btn-default" value="vorschau/' + newPictureName + '"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>';
-=======
 
 			var html = '<tr id="' + newPictureName + '"><td style="border: 2px solid black;"><img src="pictures/' + newPictureName + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + newPictureName + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><button title="Löschen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + newPictureName + '"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button title="Download" name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;" class="btn btn-default" value="vorschau/' + newPictureName + '"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>';
->>>>>>> OSX
 
 			$("#letzterTable").prepend(html);
 
 			$("[name='download']").each(function () {
-<<<<<<< HEAD
-				console.log("each download");
-				$(this).click(function () {
-					top.location.href = this.value;
-=======
 				$(this).click(function () {
 					top.location.href = $(this).attr("href");
->>>>>>> OSX
 				});
 			});
 
