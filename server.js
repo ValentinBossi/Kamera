@@ -9,6 +9,10 @@ var fs = require('fs');
 var bodyParser = require("body-parser");
 var df = require("node-df");
 
+app.use(express.static(path.resolve(__dirname, "public")));
+
+app.use('/vorschau', express.static(__dirname + '/public'));
+
 var
 	options = {
 		file: '/home',
@@ -28,34 +32,40 @@ df(options, function (error, response) {
 var tmpCounter = 0;
 var medienOrdnerInhalt = [];
 var picToCopyString;
+var gesicherteMedien = [];
+var zuKopierendeMedien = [];
 
 // wenn von mount ein String zurück kommt, ist ein Stick eingesteckt
 // TO-DO: checken, ob Stick Fat32 ist
-var usbOK = null;
+var usbOK = false;
 var kameraOK = true;
+var amKopieren = false;
+
 var systemStatus = {
 	usbOK: usbOK,
-	kameraOK: kameraOK
+	kameraOK: kameraOK,
+	amKopieren: amKopieren
 };
-var pathToMediaFolder = '/home/pi/git/Kamera/public/pictures/';
+var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures/';
 var arrayOfPictures;
 var objectOfPicturesArray = [];
-var usbStick = "/media/usb0";
+var usbStick = "/Volumes/FAT32";
 
 //Makes this entries array available in all views
 app.locals.systemStatus = systemStatus;
 
 var usbCheck = function () {
-	exec('mount | grep "media/usb0"', function (error, stdout, stderr) {
-		if (stdout === '') {
-			systemStatus.usbOK = false;
-		} else {
+	exec('diskutil list | grep "FAT32"', function (error, stdout, stderr) {
+		if (stdout.length > 0) {
 			systemStatus.usbOK = true;
+		} else {
+			systemStatus.usbOK = false;
 		}
 		//console.log('stdout ' + stdout);
 		//console.log('stderr ' + stderr);
 		if (error !== null) {
 			console.log('exec error mount: ' + error);
+			systemStatus.usbOK = false;
 		}
 	});
 }
@@ -73,86 +83,53 @@ app.use(morgan("short"));
 
 // index page 
 app.get('/', function (req, res) {
-	usbCheck();
+	//usbCheck();
 	setTimeout(function () {
 		res.render('pages/index');
 	}, 50)
 });
 
-
 io.on('connection', function (client) {
 	console.log('Kamera connected...');
 
-	client.on('startCopyToUSBProcess', function (data) {
+	client.on('kopierenStarten', function (data) {
 		
-		
-		if (medienOrdnerInhalt[0] !== undefined && data.sendMediaList) {
-			umgekehrteReihenfolge = [];
-			for(var i=medienOrdnerInhalt.length-1; i >= 0; i--){
-				umgekehrteReihenfolge.push(medienOrdnerInhalt[i]);
-			}
-			client.emit('startCopyToUSBProcess', umgekehrteReihenfolge);
+		if(data.status === "start"){
+			zuKopierendeMedien = medienOrdnerInhalt;
 		}
-		if(data.startCopy){
-			picToCopyString = medienOrdnerInhalt.pop().name;
-			picToCopy = pathToMediaFolder + picToCopyString;
-			console.log(picToCopy);
-			exec("cp " + picToCopy + " " + usbStick, function (error, stdout, stderr) {
 
-					console.log('stdout ' + stdout);
-					console.log('stderr ' + stderr);
+		console.log("kopierenStarten!", data);
+		console.log(zuKopierendeMedien);
+		
+		if (zuKopierendeMedien.length > 0) {
+			bildZumKopieren = zuKopierendeMedien.pop().name;
+			console.log("kopieren!", data.status);
+			systemStatus.amKopieren = true;
+			bild = pathToMediaFolder + bildZumKopieren;
+			exec("cp " + bild + " " + usbStick, function (error, stdout, stderr) {
 
-					if (error !== null) {
-						console.log('exec error copy to usb stick: ' + error);
-					} else {
-						client.emit('startCopyToUSBProcess', picToCopyString);
-					}
-				});
+				console.log('stdout ' + stdout);
+				console.log('stderr ' + stderr);
+
+				if (error !== null) {
+					console.log('exec error copy to usb stick: ' + error);
+				} else {
+					client.emit('hatKopiert', bild);
+					console.log("bild wurde kopiert!", bild);
+				}
+			});
+		} else {
+			client.emit('hatKopiert', "ende");
+			console.log("nicht kopieren!", data.status);
+			systemStatus.amKopieren = false;
 		}
-		/**
-		console.log(data);
-		console.log(typeof data);
-		if (medienOrdnerInhalt[0] !== undefined) {
-			client.emit('startCopyToUSBProcess', medienOrdnerInhalt);
-
-			//starte Kopierprozess
-			console.log(medienOrdnerInhalt);
-
-			for (property in medienOrdnerInhalt) {
-				
-				picToCopyString = medienOrdnerInhalt[property].name;
-				console.log("pic bei for schloaufe" , picToCopyString);
-				picToCopy = pathToMediaFolder + medienOrdnerInhalt[property].name;
-
-				//console.log(medienOrdnerInhalt[property].name);
-
-				exec("cp " + picToCopy + " " + usbStick, function (error, stdout, stderr) {
-
-					console.log('stdout ' + stdout);
-					console.log('stderr ' + stderr);
-
-					if (error !== null) {
-						console.log('exec error copy to usb stick: ' + error);
-					}
-					client.emit('startCopyToUSBProcess', picToCopyString);
-				});
-
-			}
-			 funktioniert!
-			setTimeout(function(){
-				client.emit('startCopyToUSBProcess', ".AppleDouble");
-			},5000)
-		}**/
-		
-		
 	});
-
-
 
 });
 
 
 app.get('/vorschau', function (reg, res) {
+	usbCheck();
 	fs.readdir(pathToMediaFolder, function (err, list) {
 		medienOrdnerInhalt = [];
 		list.forEach(function (pic) {
@@ -160,63 +137,19 @@ app.get('/vorschau', function (reg, res) {
 				name: pic
 			});
 		});
+		console.log(systemStatus);
+		console.log(medienOrdnerInhalt);
 		app.locals.pictures = medienOrdnerInhalt;
-		res.render('pages/vorschau');
+		// um usbCheck() erkennen zu koennen!
+		setTimeout(function () {
+			res.render('pages/vorschau');
+		}, 100)
 	});
 });
-
-/**app.post('/aufUSBStickSPeichern', function (reg, res) {
-	console.log(reg.body);
-	res.render('pages/aufUsbStickSpeichern');
-});**/
 
 app.get('/vorschau/:picture', function (reg, res) {
 	res.download(pathToMediaFolder + reg.params.picture);
 });
-
-app.get("/aufUSBStickSPeichern", function (reg, res) {
-
-	res.render('pages/aufUsbStickSpeichern');
-
-});
-/**
-app.put("/aufUSBStickSPeichern", function (reg, res) {
-	
-	obKummuniziert = Object.keys(reg.body);
-	obKummuniziert = obKummuniziert.toString();
-	console.log(obKummuniziert);
-	
-	var medienOrdnerInhalt = [];
-	fs.readdir(pathToMediaFolder, function(err, list){
-		list.forEach(function(pic){
-			medienOrdnerInhalt.push({name: pic});
-		});
-		app.locals.pictures = medienOrdnerInhalt;
-		res.send(medienOrdnerInhalt);
-	});
-	
-
-});**/
-
-//brauchts nicht mehr, da einfach alle in der Vorschau enthaltene Bilder gespeichert werden.
-/**app.post('/picturesToSave', function (reg, res) {
-	var a = reg.body;
-	console.log(reg.body);
-
-	setTimeout(function () {
-		res.json({
-			ok: a
-		});
-	}, 3000)
-
-
-	for (property in a) {
-		console.log(property);
-	}
-
-
-
-});**/
 
 app.post('/pictureToDelete', function (reg, res) {
 
@@ -246,31 +179,11 @@ app.post('/pictureToDelete', function (reg, res) {
 			app.locals.pictures = medienOrdnerInhalt;
 
 			res.json({
-				deletedPicture: picString
+				medienOrdnerInhalt
 			});
 		});
 
 	});
-
-	/**var childProcess = require('child_process'),
-		ls;
-	console.log("aaaaaaaaaaaaaaaa: rm -rf "+pathToPicture);
-	ls = childProcess.exec('rm -rf '+pathToPicture, function (error, stdout, stderr) {
-		if (error) {
-			console.log(error.stack);
-			console.log('Error code: ' + error.code);
-			console.log('Signal received: ' + error.signal);
-		}
-		console.log('Child Process STDOUT: ' + stdout);
-		console.log('Child Process STDERR: ' + stderr);
-	});
-	ls.on('exit', function (code) {
-		console.log('Child process exited with exit code ' + code);
-		//res.send("pictureDeleted!");
-		res.json({
-				deletedPicture: picString
-			});
-	});**/
 
 });
 
@@ -316,35 +229,23 @@ app.get('/fotoMachen', function (req, res) {
 		});
 	});
 
-	/**
-	var picName = "8MP3mmLinseMode2q100_";
-	tmpCounter++;
-	picName = picName + tmpCounter + ".jpg";
-	console.log(picName);
-	var path = "/home/pi/GreinerCam/NodeJS/Express/public/pictures/";
-	var command = "cp ";
-	var toCopyPic = "/home/pi/GreinerCam/NodeJS/Express/public/pictures/8MP3mmLinseMode2q100_.jpg ";
-	var newPic = path + picName
-	var concatedCommand = command + toCopyPic + newPic;
-	console.log
-	exec(concatedCommand, function (error, stdout, stderr) {
-		data = stdout;
+});
+
+app.post('/datentraegerAuswerfen', function (req, res) {
+
+	exec('diskutil umountDisk /dev/disk2', function (error, stdout, stderr) {
+
 		console.log('stdout ' + stdout);
 		console.log('stderr ' + stderr);
 		if (error !== null) {
-			console.log('exec error cp: ' + error);
+			console.log('exec error umount: ' + error);
+		} else {
+			res.send("Datenträger ausgeworfen!");
 		}
-		setTimeout(function () {
-			res.json({
-				newPicture: picName
-			});
-		}, 3000);
 	});
-	console.log("ausgeführt!");**/
-
 });
 
 //console.log(fs.createReadStream('test.log').pipe(fs.createWriteStream('newLog.log')));
 
-app.use(express.static(path.resolve(__dirname, "public")));
+
 server.listen(3000);
