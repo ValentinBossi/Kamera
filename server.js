@@ -39,12 +39,11 @@ var zuKopierendeMedien = [];
 // TO-DO: checken, ob Stick Fat32 ist
 var usbOK = false;
 var kameraOK = true;
-var amKopieren = false;
+
 
 var systemStatus = {
 	usbOK: usbOK,
 	kameraOK: kameraOK,
-	amKopieren: amKopieren
 };
 var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures/';
 var arrayOfPictures;
@@ -104,7 +103,6 @@ io.on('connection', function (client) {
 		if (zuKopierendeMedien.length > 0) {
 			bildZumKopieren = zuKopierendeMedien.pop().name;
 			console.log("kopieren!", data.status);
-			systemStatus.amKopieren = true;
 			bild = pathToMediaFolder + bildZumKopieren;
 			exec("cp " + bild + " " + usbStick, function (error, stdout, stderr) {
 
@@ -114,14 +112,13 @@ io.on('connection', function (client) {
 				if (error !== null) {
 					console.log('exec error copy to usb stick: ' + error);
 				} else {
-					client.emit('hatKopiert', bild);
-					console.log("bild wurde kopiert!", bild);
+					client.emit('hatKopiert', bildZumKopieren);
+					console.log("bild wurde kopiert!", bildZumKopieren);
 				}
 			});
 		} else {
 			client.emit('hatKopiert', "ende");
 			console.log("nicht kopieren!", data.status);
-			systemStatus.amKopieren = false;
 		}
 	});
 
