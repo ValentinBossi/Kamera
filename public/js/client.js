@@ -39,9 +39,13 @@ var main = function () {
 				});
 				deleteRequest.done(function (medienAufServer) {
 					console.log(medienAufServer);
-					medienOrdner = medienAufServer;
+					medienOrdner = JSON.parse(medienAufServer);
 					console.log("erste loeschen funktion");
 					$(element).remove();
+					console.log(medienOrdner.length);
+					if (medienOrdner.length == 0) {
+						pageCheck();
+					}
 				});
 			});
 			console.log("jquery löschen ausgeführt");
@@ -66,6 +70,7 @@ var main = function () {
 
 
 	//soll gefüllt werden, mit fotos, die gemacht werden! hier nur zum testen!
+	//soll durch medienOrdner ersetzt werden, denn das gibts schon!!!! (bei loeschen funktion)
 	var pictures = [];
 	$("img+div").each(function () {
 		pictures.push({
@@ -78,6 +83,7 @@ var main = function () {
 		"kopieren": false,
 		"bereitOhneUSB": false,
 		"bereitMitUSB": false,
+		"bereitOhneFotosMitUSB": false,
 		"macheFoto": false,
 		"macheVideo": false
 	}
@@ -107,6 +113,12 @@ var main = function () {
 			$("#videoMachen").replaceWith(videoButtonParat);
 			$("#fotoMachen").replaceWith(fotoButtonParat);
 		}
+		if (kameraStatus.bereitOhneFotosMitUSB) {
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonParat);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
+			$("#videoMachen").replaceWith(videoButtonParat);
+			$("#fotoMachen").replaceWith(fotoButtonParat);
+		}
 		if (kameraStatus.macheFoto) {
 			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
 			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
@@ -125,6 +137,24 @@ var main = function () {
 	var socket = io.connect('/');
 	var medienOrdner = [];
 
+	var pageCheck = function () {
+		var hatBilder = $("img");
+		if (hatBilder.length == 0) {
+			$("#letzterTable").append('<h3 align="center"">Keine Fotos!</h3>');
+			statusDerButtons({
+				"auswerfen": false,
+				"kopieren": false,
+				"bereitOhneUSB": false,
+				"bereitMitUSB": false,
+				"bereitOhneFotosMitUSB": true,
+				"macheFoto": false,
+				"macheVideo": false
+			})
+		}
+	};
+
+	pageCheck();
+
 	socket.on('hatKopiert', function (bild) {
 		status.amKopieren = true;
 		console.log("hat kopiert", bild);
@@ -139,6 +169,7 @@ var main = function () {
 				"kopieren": false,
 				"bereitOhneUSB": false,
 				"bereitMitUSB": true,
+				"bereitOhneFotosMitUSB": false,
 				"macheFoto": false,
 				"macheVideo": false
 			});
@@ -164,6 +195,7 @@ var main = function () {
 			"kopieren": true,
 			"bereitOhneUSB": false,
 			"bereitMitUSB": false,
+			"bereitOhneFotosMitUSB": false,
 			"macheFoto": false,
 			"macheVideo": false
 		});
@@ -203,6 +235,7 @@ var main = function () {
 				"kopieren": false,
 				"bereitOhneUSB": true,
 				"bereitMitUSB": false,
+				"bereitOhneFotosMitUSB": false,
 				"macheFoto": false,
 				"macheVideo": false
 			});

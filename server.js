@@ -45,16 +45,16 @@ var systemStatus = {
 	usbOK: usbOK,
 	kameraOK: kameraOK,
 };
-var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures/';
+var pathToMediaFolder = '/home/pi/git/Kamera/public/pictures/';
 var arrayOfPictures;
 var objectOfPicturesArray = [];
-var usbStick = "/Volumes/FAT32";
+var usbStick = "/media/usb0";
 
 //Makes this entries array available in all views
 app.locals.systemStatus = systemStatus;
 
 var usbCheck = function () {
-	exec('diskutil list | grep "FAT32"', function (error, stdout, stderr) {
+	exec('mount | grep "/media/usb0"', function (error, stdout, stderr) {
 		if (stdout.length > 0) {
 			systemStatus.usbOK = true;
 		} else {
@@ -175,9 +175,8 @@ app.post('/pictureToDelete', function (reg, res) {
 
 			app.locals.pictures = medienOrdnerInhalt;
 
-			res.json({
-				medienOrdnerInhalt
-			});
+			res.json(medienOrdnerInhalt);
+			console.log(medienOrdnerInhalt);
 		});
 
 	});
@@ -230,14 +229,15 @@ app.get('/fotoMachen', function (req, res) {
 
 app.post('/datentraegerAuswerfen', function (req, res) {
 
-	exec('diskutil umountDisk /dev/disk2', function (error, stdout, stderr) {
+	exec('sudo umount /media/usb0', function (error, stdout, stderr) {
 
 		console.log('stdout ' + stdout);
 		console.log('stderr ' + stderr);
 		if (error !== null) {
 			console.log('exec error umount: ' + error);
+			res.send("false");
 		} else {
-			res.send("Datenträger ausgeworfen!");
+			res.send("true");
 		}
 	});
 });
