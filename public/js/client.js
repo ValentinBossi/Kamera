@@ -5,13 +5,7 @@ var main = function () {
 		"amKopieren": false
 	};
 
-	window.onbeforeunload = function () {
-		if (status.amKopieren) {
-			return "Der Speichervorgang wird nicht abgeschlossen, wenn du die Seite verlässt!";
-		} else {
-			return "";
-		}
-	};
+	var statusJetztUndVorher = [];
 
 	var checkDownloads = function () {
 		$("[name='download']").each(function () {
@@ -119,6 +113,12 @@ var main = function () {
 			$("#videoMachen").replaceWith(videoButtonParat);
 			$("#fotoMachen").replaceWith(fotoButtonParat);
 		}
+		if (kameraStatus.bereitOhneFotosOhneUSB) {
+			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
+			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
+			$("#videoMachen").replaceWith(videoButtonParat);
+			$("#fotoMachen").replaceWith(fotoButtonParat);
+		}
 		if (kameraStatus.macheFoto) {
 			$("#datentraegerAuswerfen").replaceWith(auswerfenButtonDisabled);
 			$("#aufDatentraegerSpeichern").replaceWith(kopierenButtonDisabled);
@@ -140,16 +140,7 @@ var main = function () {
 	var pageCheck = function () {
 		var hatBilder = $("img");
 		if (hatBilder.length == 0) {
-			$("#letzterTable").append('<h3 align="center"">Keine Fotos!</h3>');
-			statusDerButtons({
-				"auswerfen": false,
-				"kopieren": false,
-				"bereitOhneUSB": false,
-				"bereitMitUSB": false,
-				"bereitOhneFotosMitUSB": true,
-				"macheFoto": false,
-				"macheVideo": false
-			})
+			$("#letzterTable").append('<h3 id="keineFotos" align="center"">Keine Fotos!</h3>');
 		}
 	};
 
@@ -241,18 +232,35 @@ var main = function () {
 			});
 		});
 	});
-
+	
 	//bei jedem Fotomachen soll der medienOrdner gefüllt werden und schon in den unsichtbaren table gefüllt werden!
 	$('#fotoMachen').click(function () {
+		console.log("haallloo?");
 
-		$(this).html('<div style="vertical-align:middle;" class="loader"></div>');
+		$("#fotoMachen").replaceWith(fotoButtonBusy);
 
-		var photoRequest = $.ajax({
-			url: "/fotoMachen",
-			dataType: "text",
-			method: "GET",
+		
+		socket.emit('fotoMachen');
+
+
 		});
+	
+	socket.on('fotoMachen', function (data) {
 
+			setTimeout(function () {
+				console.log(typeof data);
+
+
+				$("#letzterTable").prepend('<tr id="' + data + '"><td style="border: 2px solid black;"><img src="pictures/' + data + '" style="width: 100%;"><div style="background-color: black; color: white; padding-top: 5px; padding-bottom: 5px;" align="center">' + data + '</div><div style="margin-top: 10px; margin-bottom: 20px;" align="center"><button title="Löschen" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#bc4b51; margin-right: 10px;" class="btn btn-default" name="loeschen" id="' + data + '"><span style="font-size:2.5em; " class="glyphicon glyphicon-trash"></span></button><button title="Download" name="download" style="width: 100px; height: 67px; border-radius: 20px; border: 0px; background-color:#f4e285; margin-right: 10px;" class="btn btn-default" value="vorschau/' + data + '"><span style="font-size:2.5em;" class="glyphicon glyphicon-cloud-download"></span></button></div></td></tr>')
+				checkDownloads();
+				checkLoeschen();
+				$("#keineFotos").remove();
+				$("#fotoMachen").replaceWith(fotoButtonParat);
+
+			}, 1000);
+
+	
+		/**
 		photoRequest.done(function (data) {
 			newPic = $.parseJSON(data);
 			console.log(newPic.newPicture);
@@ -303,7 +311,7 @@ var main = function () {
 		});
 		photoRequest.fail(function () {
 			console.log("konnte kein Foto machen!");
-		});
+		});**/
 	});
 }
 $(document).ready(main);
