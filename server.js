@@ -38,22 +38,20 @@ var zuKopierendeMedien = [];
 
 // wenn von mount ein String zurück kommt, ist ein Stick eingesteckt
 // TO-DO: checken, ob Stick Fat32 ist
-var usbOK = false;
-var kameraOK = true;
-var fotoMachen = false;
-var videoMachen = false;
-var kopieren = false;
 
 
 var systemStatus = {
-	usbOK: usbOK,
-	kameraOK: kameraOK,
-	fotoMachen: fotoMachen,
-	videoMachen: videoMachen,
-	kopieren: kopieren,
+	usbOK: false,
+	kameraOK: true,
+	fotoMachen: false,
+	videoMachen: false,
+	kopieren: false,
 	medien: medienOrdnerInhalt
 };
-var pathToMediaFolder = '/home/pi/git/Kamera/public/pictures/';
+
+// pi '/home/pi/git/Kamera/public/pictures/'
+// OSX '/Users/bossival/git/Kamera/public/pictures/'
+var pathToMediaFolder = '/Users/bossival/git/Kamera/public/pictures/';
 var arrayOfPictures;
 var objectOfPicturesArray = [];
 var usbStick = "/media/usb0";
@@ -61,11 +59,13 @@ var usbStick = "/media/usb0";
 //Makes this entries array available in all views
 app.locals.systemStatus = systemStatus;
 
-var args = ["-t", "0", "-k", "-o", pathToMediaFolder+"bild%02d.jpg", "-v"]
-const child = spawn('raspistill', args);
+var args = ["-t", "0", "-k", "-o", pathToMediaFolder + "bild%02d.jpg", "-v"]
+	//const child = spawn('raspistill', args);
 
+// OSX 'diskutil list | grep "FAT32"'
+// pi 'mount | grep "FAT32"'
 var usbCheck = function () {
-	exec('mount | grep "/media/usb0"', function (error, stdout, stderr) {
+	exec('diskutil list | grep "FAT32"', function (error, stdout, stderr) {
 		if (stdout.length > 0) {
 			systemStatus.usbOK = true;
 		} else {
@@ -110,8 +110,53 @@ app.get('/', function (req, res) {
 
 io.on('connection', function (client) {
 	console.log('Kamera connected...');
-	
+	//console.log(client.id);
+	//console.log(io.sockets.clients().connected);
 
+	//Bild löschen
+	client.on('bildLoeschen', function (bild) {
+		var pathToPicture = pathToMediaFolder + bild;
+		exec('rm -rf ' + pathToPicture, function (error, stdout, stderr) {
+			console.log('stdout ' + stdout);
+			console.log('stderr ' + stderr);
+			if (error !== null) {
+				console.log('exec error rm: ' + error);
+			} else {
+				console.log("Bild wurde gelöscht: ", bild);
+				fs.readdir(pathToMediaFolder, function (err, list) {
+					medienOrdnerInhalt = [];
+					list.forEach(function (pic) {
+						medienOrdnerInhalt.push({
+							name: pic
+						});
+					});
+					app.locals.pictures = medienOrdnerInhalt;
+					systemStatus.medien = medienOrdnerInhalt;
+					console.log(medienOrdnerInhalt);
+					client.emit('bildLoeschen', bild);
+				});
+			}
+		});
+	});
+
+	//Datenträger auswerfen
+	client.on('datentraegerAuswerfen', function () {
+		// pi 'sudo umount /media/usb0'
+		// OSX diskutil umountDisk /dev/disk3
+		exec('diskutil umountDisk /dev/disk3', function (error, stdout, stderr) {
+			console.log('stdout ' + stdout);
+			console.log('stderr ' + stderr);
+			if (error !== null) {
+				console.log('exec error umount: ' + error);
+				client.emit('datentraegerAuswerfen', true);
+			} else {
+				client.emit('datentraegerAuswerfen', false);
+				systemStatus.usbOK = false;
+			}
+		});
+	});
+
+	//kopieren
 	client.on('kopierenStarten', function (data) {
 
 		if (data.status === "start") {
@@ -143,38 +188,27 @@ io.on('connection', function (client) {
 		}
 	});
 
+	//Foto machen
 	client.on('fotoMachen', function () {
-		//console.log(data);
-		child.stdin.write("\n");
-		/**
-		setTimeout(function () {
-			child.stdin.write("\n");
-			setTimeout(function () {
-				child.stdin.write("X\n");
-			}, 5000);
-		}, 10000);**/
 
-		child.on('error', (err) => {
-			console.log('Failed to start child process.' + err);
-			//client.emit('fotoMachen', {"status": "error", "message": err});
-		});
-		
+		// pi child.stdin.write("\n");
+
 		/** stout wird von raspistill nicht verwendet! kein output!
-		child.stdout.on('data', (data) => {
-			child.stdin.write(data);
-			client.emit('fotoMachen', {
-				"status": "stdout",
-				"message": data
-			});
-		});**/
+               child.stdout.on('data', (data) => {
+                       child.stdin.write(data);
+                       client.emit('fotoMachen', {
+                               "status": "stdout",
+                               "message": data
+                       });
+               });**/
 		
 		// stderr wird von raspistill als standart output verwendet! anstatt stdout! 
 		var i = 0;
 		child.stderr.on('data', (data) => {
-			
+
 			console.log(`raspistill stderr: ${data}`);
-			console.log("ausgegeben:::::::::::::::::",i);
-			if(data.includes("Opening output")){
+			console.log("ausgegeben:::::::::::::::::", i);
+			if (data.includes("Opening output")) {
 				var words = data.toString().split(" ");
 				var file = words[3];
 				var tree = file.split("/");
@@ -185,13 +219,14 @@ io.on('connection', function (client) {
 			i++;
 			/**
 			if(data.toString().includes("Opening output")){
-				client.emit('fotoMachen', data.toString());
+			        client.emit('fotoMachen', data.toString());
 			}
 			if(data.toString().includes("Finished capture")){
-				client.emit('fotoMachen', data.toString());
-			}**/
-			//client.emit('fotoMachen', {"status": "stderr", "message": data});
+			        client.emit('fotoMachen', data.toString());
+			}**/ //client.emit('fotoMachen', {"status": "stderr", "message": data});
 		});
+		client.emit('fotoMachen', "bildSuper!");
+
 
 		child.on('close', (code) => {
 			if (code !== 0) {
@@ -199,10 +234,13 @@ io.on('connection', function (client) {
 				//client.emit('fotoMachen', {"status": "close", "message": code});
 			}
 		});
+
+
 	});
-	
-	client.on('status', function(){
+
+	client.on('status', function () {
 		client.emit('status', systemStatus);
+		console.log(systemStatus);
 	});
 
 });
@@ -217,9 +255,10 @@ app.get('/vorschau', function (reg, res) {
 				name: pic
 			});
 		});
-		console.log(systemStatus);
-		console.log(medienOrdnerInhalt);
+		//console.log(systemStatus);
+		//console.log(medienOrdnerInhalt);
 		app.locals.pictures = medienOrdnerInhalt;
+		systemStatus.medien = medienOrdnerInhalt;
 		// um usbCheck() erkennen zu koennen!
 		setTimeout(function () {
 			res.render('pages/vorschau');
@@ -230,58 +269,6 @@ app.get('/vorschau', function (reg, res) {
 app.get('/vorschau/:picture', function (reg, res) {
 	res.download(pathToMediaFolder + reg.params.picture);
 });
-
-app.post('/pictureToDelete', function (reg, res) {
-
-	var picture = Object.keys(reg.body);
-	var picString = picture.toString();
-	var pathToPicture = pathToMediaFolder + picString;
-
-	//node MUSS mit sudo ausgeführt werden, um .AppleDouble löschen zu können!
-	//habe -rf hinzugefügt, da .AppleDouble (auf raspi zero) so gelöscht werden konnte. ohne -rf nicht!
-	exec('rm -rf ' + pathToPicture, function (error, stdout, stderr) {
-
-		console.log('stdout ' + stdout);
-		console.log('stderr ' + stderr);
-		if (error !== null) {
-			console.log('exec error rm: ' + error);
-		}
-		console.log("aaaaaaaaaaaaaaaa: rm -rf " + pathToPicture);
-
-		fs.readdir(pathToMediaFolder, function (err, list) {
-			medienOrdnerInhalt = [];
-			list.forEach(function (pic) {
-				medienOrdnerInhalt.push({
-					name: pic
-				});
-			});
-
-			app.locals.pictures = medienOrdnerInhalt;
-
-			res.json(medienOrdnerInhalt);
-			console.log(medienOrdnerInhalt);
-		});
-
-	});
-
-});
-
-app.post('/datentraegerAuswerfen', function (req, res) {
-
-	exec('sudo umount /media/usb0', function (error, stdout, stderr) {
-
-		console.log('stdout ' + stdout);
-		console.log('stderr ' + stderr);
-		if (error !== null) {
-			console.log('exec error umount: ' + error);
-			res.send("false");
-		} else {
-			res.send("true");
-			systemStatus.usbOK = false;
-		}
-	});
-});
-
 //console.log(fs.createReadStream('test.log').pipe(fs.createWriteStream('newLog.log')));
 
 

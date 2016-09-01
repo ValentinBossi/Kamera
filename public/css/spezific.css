@@ -1,3 +1,14 @@
+.loader {
+	margin-left: 25%;
+	border: 1px solid black;
+	border-radius: 50%;
+	border-top: 1px solid transparent;
+	width: 30px;
+	height: 30px;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
+}
+
 .loaderSpeichern {
 	margin-left: 25%;
 	border: 1px solid black;
@@ -9,6 +20,7 @@
 	animation: spin 2s linear infinite;
 }
 
+/**#bc4b51**/
 .loaderAuswerfen {
 	margin-left: 25%;
 	border: 1px solid black;
