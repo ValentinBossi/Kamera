@@ -12,7 +12,7 @@ const spawn = require('child_process').spawn;
 
 //app.use(express.static(path.resolve(__dirname, "/public")));
 
-app.use('/vorschau', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/public'));
 
 var
 	options = {
@@ -152,7 +152,7 @@ io.on('connection', function (client) {
 	client.on('kopierenStarten', function (data) {
 
 		if (data.status === "start") {
-			let zuKopierendeMedien = medienOrdnerInhalt;
+			var zuKopierendeMedien = medienOrdnerInhalt;
 		}
 
 		console.log("kopierenStarten!", data);
