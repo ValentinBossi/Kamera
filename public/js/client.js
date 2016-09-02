@@ -82,13 +82,13 @@ var main = function () {
 			$(this).click(function () {
 				var picture = this.getAttribute("data");
 				var tableZuLoeschen = document.getElementById(this.getAttribute("data"));
-				
+
 				$(this).html('<div style="vertical-align:middle;" class="loader"></div>');
 				socket.emit('bildLoeschen', picture);
-				socket.on('bildLoeschen', function(bild){
+				socket.on('bildLoeschen', function (bild) {
 					$(tableZuLoeschen).remove();
 					imageCheck();
-					
+
 				});
 			});
 			//console.log("jquery löschen ausgeführt");
@@ -97,14 +97,14 @@ var main = function () {
 	loeschen();
 
 	/////////////////////////////////////////////////////////DIVERSE-FUNKTIONEN/////////////////////////////////////////////////////////
-	
-	var erstelleKopierGallerie = function ()
-	
+
+	//var erstelleKopierGallerie = function ()
+	/**
 	$("img+div").each(function () {
 		pictures.push({
 			"name": this.textContent
 		});
-	});
+	});**/
 
 	var aufSpeichernListeBildHinzufuegen = function (bild) {
 		console.log(bild);
@@ -210,6 +210,31 @@ var main = function () {
 			}
 
 			$("#speichernPanel").slideDown(300);
+			socket.on('hatKopiert', function (bild) {
+				systemStatus.amKopieren = true;
+				console.log("hat kopiert", bild);
+				console.log(pictures);
+
+				$("#slide8MP3mmLinseMode1q100Kopie8.jpg" + bild).slideUp(400, function (bild) {
+					$("#tr" + bild).remove();
+				});
+				if (bild === "ende") {
+					systemStatus.amKopieren = false;
+					statusDerButtons({
+						"kopieren": false,
+						"bereitOhneUSB": false,
+						"bereitMitUSB": true,
+						"bereitOhneFotosMitUSB": false,
+						"macheFoto": false,
+						"macheVideo": false
+					});
+				} else {
+					socket.emit('kopierenStarten', {
+						"status": "kopieren"
+					});
+				}
+
+			});
 		});
 	}
 
@@ -238,31 +263,5 @@ var main = function () {
 		});
 	};
 	fotoMachen();
-	/////////////////////////////////////////////////////SOCKET-FUNKTIONEN////////////////////////////////////////////////////////////
-	socket.on('hatKopiert', function (bild) {
-		systemStatus.amKopieren = true;
-		console.log("hat kopiert", bild);
-		console.log(pictures);
-
-		$("#slide8MP3mmLinseMode1q100Kopie8.jpg" + bild).slideUp(400, function (bild) {
-			$("#tr" + bild).remove();
-		});
-		if (bild === "ende") {
-			systemStatus.amKopieren = false;
-			statusDerButtons({
-				"kopieren": false,
-				"bereitOhneUSB": false,
-				"bereitMitUSB": true,
-				"bereitOhneFotosMitUSB": false,
-				"macheFoto": false,
-				"macheVideo": false
-			});
-		} else {
-			socket.emit('kopierenStarten', {
-				"status": "kopieren"
-			});
-		}
-
-	});
 }
 $(document).ready(main);

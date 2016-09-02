@@ -10,7 +10,7 @@ var bodyParser = require("body-parser");
 var df = require("node-df");
 const spawn = require('child_process').spawn;
 
-app.use(express.static(path.resolve(__dirname, "public")));
+//app.use(express.static(path.resolve(__dirname, "/public")));
 
 app.use('/vorschau', express.static(__dirname + '/public'));
 
@@ -35,6 +35,7 @@ var medienOrdnerInhalt = [];
 var picToCopyString;
 var gesicherteMedien = [];
 var zuKopierendeMedien = [];
+var fotoZaehler = 0;
 
 // wenn von mount ein String zurück kommt, ist ein Stick eingesteckt
 // TO-DO: checken, ob Stick Fat32 ist
@@ -59,7 +60,7 @@ var usbStick = "/media/usb0";
 //Makes this entries array available in all views
 app.locals.systemStatus = systemStatus;
 
-var args = ["-t", "0", "-k", "-o", pathToMediaFolder + "bild%02d.jpg", "-v"]
+var args = ["-t", "0", "-k", "-o", pathToMediaFolder + "bild.jpg", "-v"]
 	//const child = spawn('raspistill', args);
 
 // OSX 'diskutil list | grep "FAT32"'
@@ -84,7 +85,6 @@ usbCheck();
 var zeitstempel = function () {
 	full = new Date();
 	datum = full.toLocaleDateString().replace(/\//g, "_");
-	datum
 	zeit = full.toLocaleTimeString();
 	zeit = zeit.substring(0, zeit.indexOf(' PM')).replace(/:/g, "_");
 	return datum + "_" + zeit;;
@@ -100,20 +100,12 @@ app.use(bodyParser.urlencoded({
 
 app.use(morgan("short"));
 
-// index page 
-app.get('/', function (req, res) {
-	//usbCheck();
-	setTimeout(function () {
-		res.render('pages/index');
-	}, 50)
-});
-
 io.on('connection', function (client) {
 	console.log('Kamera connected...');
 	//console.log(client.id);
 	//console.log(io.sockets.clients().connected);
 
-	//Bild löschen
+	//Bild loeschen
 	client.on('bildLoeschen', function (bild) {
 		var pathToPicture = pathToMediaFolder + bild;
 		exec('rm -rf ' + pathToPicture, function (error, stdout, stderr) {
@@ -139,7 +131,7 @@ io.on('connection', function (client) {
 		});
 	});
 
-	//Datenträger auswerfen
+	//Datentraeger auswerfen
 	client.on('datentraegerAuswerfen', function () {
 		// pi 'sudo umount /media/usb0'
 		// OSX diskutil umountDisk /dev/disk3
@@ -156,11 +148,11 @@ io.on('connection', function (client) {
 		});
 	});
 
-	//kopieren
+	//Auf Datentraeger kopieren
 	client.on('kopierenStarten', function (data) {
 
 		if (data.status === "start") {
-			zuKopierendeMedien = medienOrdnerInhalt;
+			let zuKopierendeMedien = medienOrdnerInhalt;
 		}
 
 		console.log("kopierenStarten!", data);
@@ -192,41 +184,28 @@ io.on('connection', function (client) {
 	client.on('fotoMachen', function () {
 
 		// pi child.stdin.write("\n");
+		var bildname = zeitstempel() + ".jpg";
 
-		/** stout wird von raspistill nicht verwendet! kein output!
-               child.stdout.on('data', (data) => {
-                       child.stdin.write(data);
-                       client.emit('fotoMachen', {
-                               "status": "stdout",
-                               "message": data
-                       });
-               });**/
-		
 		// stderr wird von raspistill als standart output verwendet! anstatt stdout! 
-		var i = 0;
 		child.stderr.on('data', (data) => {
 
 			console.log(`raspistill stderr: ${data}`);
-			console.log("ausgegeben:::::::::::::::::", i);
-			if (data.includes("Opening output")) {
-				var words = data.toString().split(" ");
-				var file = words[3];
-				var tree = file.split("/");
-				var tree2 = tree[7].split("\n");
-				console.log(tree2[0]);
-				client.emit('fotoMachen', tree2[0]);
-			}
-			i++;
-			/**
-			if(data.toString().includes("Opening output")){
-			        client.emit('fotoMachen', data.toString());
-			}
-			if(data.toString().includes("Finished capture")){
-			        client.emit('fotoMachen', data.toString());
-			}**/ //client.emit('fotoMachen', {"status": "stderr", "message": data});
 		});
-		client.emit('fotoMachen', "bildSuper!");
-
+		//timeout, weil stderr im intervall ausgiebt und das unberechenbar ist! und es mehr sicherheit gibt, dass das bild fertig auf die sd geschrieben worden ist!
+		setTimeout(function () {
+			exec('mv ' + pathToMediaFolder + "bild.jpg " + bildname, function (error, stdout, stderr) {
+				console.log('stdout ' + stdout);
+				console.log('stderr ' + stderr);
+				if (error !== null) {
+					console.log('exec error mv: ' + error);
+				} else {
+					medienOrdnerInhalt.push({
+						name: bildname
+					});
+					client.emit('fotoMachen', bildname);
+				}
+			});
+		}, 500);
 
 		child.on('close', (code) => {
 			if (code !== 0) {
@@ -238,6 +217,7 @@ io.on('connection', function (client) {
 
 	});
 
+	//Status senden
 	client.on('status', function () {
 		client.emit('status', systemStatus);
 		console.log(systemStatus);
@@ -246,7 +226,7 @@ io.on('connection', function (client) {
 });
 
 
-app.get('/vorschau', function (reg, res) {
+app.get('/', function (reg, res) {
 	usbCheck();
 	fs.readdir(pathToMediaFolder, function (err, list) {
 		medienOrdnerInhalt = [];
