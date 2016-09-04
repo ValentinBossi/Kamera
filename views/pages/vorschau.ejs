@@ -14,10 +14,7 @@
 	</header>
 
 	<div id="speichernPanel">
-		<table style="border-bottom: 2px solid black; margin-bottom: 0px;" class="table table-striped">
-			<tbody id="bilderZumSpeichern">
-
-			</tbody>
+		<table id="bilderZumSpeichern" style="border-bottom: 2px solid black; margin-bottom: 0px;" class="table table-striped">
 		</table>
 	</div>
 
@@ -72,7 +69,9 @@
 												<table class="table table-bordered" id="letzterTable">
 													<% if (pictures.length) {%>
 														<% pictures.forEach(function(picture) { %>
-															<tr id="<%= picture.name %>">
+														<% var stringArray = picture.name.split(".") %>
+														<% var bildTr = "tr"+stringArray[0] %>
+															<tr id="<%= bildTr %>">
 																<td style="border: 2px solid black;">
 																	<% if(picture.name.includes("mp4")){ %>
 																		<video width="100%" controls>
